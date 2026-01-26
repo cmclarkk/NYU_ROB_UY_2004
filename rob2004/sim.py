@@ -122,7 +122,7 @@ class MujocoRobot:
             self.viewer.sync()
 
     def show(self, q):
-        assert not self.fixed, 'Visualization can only work for fxied body robots!'
+        assert self.fixed, 'Visualization can only work for fxied body robots!'
         assert self.visualizer_mode, 'show only works in visualization model!'
         assert np.array(q).shape == (12,), 'Wrong joint_position shape! The q must be a 12D list of floating numbers'
         self.data.qpos[:] = np.array(q)
