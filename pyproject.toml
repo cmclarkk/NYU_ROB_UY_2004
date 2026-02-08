@@ -18,12 +18,16 @@ authors = [
 dependencies = [
     "mujoco>=3.3.1",
     "matplotlib>=3.10.1",
-    "zerorpc>=0.6.3"
+    "zerorpc>=0.6.3",
+    "matplotlib>=3.10.8",
+    "pyyaml>=6.0.3",
+    "scipy>=1.15.3"
+
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
 
 [project.scripts]
-sim-server   = "scripts.simulator_app:main"
-robot-bridge = "scripts.bridge:main"
+rob2004-simulator   = "scripts.simulator_app:main"
+rob2004-robot-bridge = "scripts.bridge:main"

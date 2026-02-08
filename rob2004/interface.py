@@ -1,7 +1,7 @@
 import zerorpc
 import numpy as np
 
-class RobotInterfaceSim:
+class RobotSim:
     def __init__(self, ip='127.0.0.1', port=4242):
         self.robot = zerorpc.Client()
         # Connect to the server's address
@@ -37,8 +37,19 @@ class RobotInterfaceSim:
             raise TypeError('Tau can only be a numpy array or python list with length 12')
         self.robot.add_visual_ball(ball_pos, radius=radius)
 
+    def show(self, q):
+        if isinstance(q, np.ndarray):
+            assert q.shape==(12,), 'The shape of the joint position q should be (12,)!'
+            q_ = q.tolist()
+        elif isinstance(q, list):
+            assert len(q)==12, 'The length of the q list should be 12!'
+            q_ = q
+        else:
+            raise TypeError('Tau can only be a numpy array or python list with length 12')
+        self.robot.show(q_)
 
-class RobotInterfaceReal:
+
+class RobotReal:
     def __init__(self, ip, port=4243):
         self.robot = zerorpc.Client()
         # Connect to the server's address

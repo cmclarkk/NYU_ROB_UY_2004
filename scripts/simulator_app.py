@@ -4,8 +4,15 @@ import zerorpc
 import signal
 from rob2004.sim import MujocoRobot
 
-def main(args):
+def main():
     
+    parser = argparse.ArgumentParser(description="ZeroRPC Popper Mujoco simulator and visualizer.")
+    parser.add_argument("--visualizer", action="store_true", help="Visualizer mode (Physics disabled)")
+    parser.add_argument("--fixed_body",  action="store_true", help="Fix the robot's body in the world.")
+    parser.add_argument('--port', type=int, default=4242, help="The network port on which the simulator server listens")
+    parser.add_argument('--ip', type=str, default="0.0.0.0", help="The IP on which the simulator server listens")
+    args = parser.parse_args()
+
     def signal_handler(sig, frame):
         """
         Custom handler function called when SIGINT is received.
@@ -33,10 +40,4 @@ def main(args):
     robot_server.run()
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description="ZeroRPC Popper Mujoco simulator and visualizer.")
-    parser.add_argument("--visualizer", action="store_true", help="Visualizer mode (Physics disabled)")
-    parser.add_argument("--fixed_body",  action="store_true", help="Fix the robot's body in the world.")
-    parser.add_argument('--port', type=int, default=4242, help="The network port on which the simulator server listens")
-    parser.add_argument('--ip', type=str, default="0.0.0.0", help="The IP on which the simulator server listens")
-    args = parser.parse_args()
-    main(args)
+    main()
