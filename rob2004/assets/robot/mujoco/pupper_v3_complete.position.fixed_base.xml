@@ -114,6 +114,8 @@
                     </body>
                 </body>
             </body>
+            
+            
             <body name="leg_front_l_1" pos="0.075 0.0835 0" quat="0.707105 -0.707108 0 0"
                 gravcomp="0">
                 <inertial pos="0 0 0" mass="0.18" diaginertia="7.4e-05 5.8e-05 4.8e-05" />
@@ -177,6 +179,8 @@
                     </body>
                 </body>
             </body>
+            
+            
             <body name="leg_back_l_1" pos="-0.075 0.0725 0" quat="0.707105 -0.707108 0 0"
                 gravcomp="0">
                 <inertial pos="0 0 0" mass="0.18" diaginertia="7.4e-05 5.8e-05 4.8e-05" />

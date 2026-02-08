@@ -23,3 +23,7 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[project.scripts]
+sim-server   = "scripts.simulator_app:main"
+robot-bridge = "scripts.bridge:main"

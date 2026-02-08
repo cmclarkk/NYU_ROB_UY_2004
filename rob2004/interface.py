@@ -26,6 +26,17 @@ class RobotInterfaceSim:
         
         self.robot.setJointCommand(tau_)
 
+    def addMarker(self, ball_pos, color=np.array([0, 1, 0, 1]), radius=0.01):
+        if isinstance(ball_pos, np.ndarray):
+            assert ball_pos.shape==(3,), 'The shape for the ball position should be (3,)!'
+            ball_pos_ = ball_pos.tolist()
+        elif isinstance(ball_pos, list):
+            assert len(ball_pos)==3, 'The length of the ball position list should be 3!'
+            ball_pos_ = ball_pos
+        else:
+            raise TypeError('Tau can only be a numpy array or python list with length 12')
+        self.robot.add_visual_ball(ball_pos, radius=radius)
+
 
 class RobotInterfaceReal:
     def __init__(self, ip, port=4243):
