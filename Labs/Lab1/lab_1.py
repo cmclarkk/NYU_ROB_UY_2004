@@ -1,3 +1,5 @@
+# Andrea Gonzalez, Pingsheng Zhao, Marshal Yuan
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
