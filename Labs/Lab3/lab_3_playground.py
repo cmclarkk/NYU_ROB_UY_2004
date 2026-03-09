@@ -91,10 +91,10 @@ class InverseKinematics():
 
         self.ee_triangle_positions = [rf_ee_triangle_positions, lf_ee_triangle_positions, rb_ee_triangle_positions, lb_ee_triangle_positions]
         self.fk_functions = [self.fr_leg_fk, self.fl_leg_fk, self.br_leg_fk, self.bl_leg_fk]
-
-        self.target_joint_positions_cache, self.target_ee_cache = self.cache_target_joint_positions()
-        print(f'shape of target_joint_positions_cache: {self.target_joint_positions_cache.shape}')
-        print(f'shape of target_ee_cache: {self.target_ee_cache.shape}')
+        self.target_joint_positions_cache, self.target_ee_cache = [], []
+        # self.target_joint_positions_cache, self.target_ee_cache = self.cache_target_joint_positions()
+        # print(f'shape of target_joint_positions_cache: {self.target_joint_positions_cache.shape}')
+        # print(f'shape of target_ee_cache: {self.target_ee_cache.shape}')
 
 
     def fr_leg_fk(self, theta):
@@ -136,14 +136,37 @@ class InverseKinematics():
         ################################################################################################
         # TODO: [already done] paste lab 3 inverse kinematics here
         ################################################################################################
-        return 0
+        return np.linalg.norm(desired_position - self.leg_forward_kinematics(theta))
 
     def inverse_kinematics_single_leg(self, target_ee, leg_index, initial_guess=[0, 0, 0]):
         self.leg_forward_kinematics = self.fk_functions[leg_index]
+        # target_ee = np.asarray(target_ee, dtype=float)
+        x0 = initial_guess
+
+        # bounds = [(-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi)]
+
+        res = scipy.optimize.minimize(
+            fun=self.get_error_leg,
+            x0=x0,
+            args=(target_ee,),
+            method='L-BFGS-B',
+            # bounds=bounds,
+            options={'maxiter': 200, 'ftol': 1e-12}
+        )
+
+
+        if not res.success:
+            res = scipy.optimize.minimize(
+                fun=self.get_error_leg,
+                x0=x0,
+                args=(target_ee,),
+                method='Nelder-Mead',
+                options={'maxiter': 400, 'xatol': 1e-8, 'fatol': 1e-10}
+            )
+
+        return res.x
         ################################################################################################
-        # TODO: implement interpolation for all 4 legs here
-        ################################################################################################
-        return 0
+
 
     def interpolate_triangle(self, t, leg_index):
         ################################################################################################
@@ -209,6 +232,8 @@ def main():
         result_ee = inverse_kinematics.leg_forward_kinematics(theta)
         result_ee_list.append(result_ee)
 
+    print(result_ee_list)
+
     # Plot the EE results
     if len(result_ee_list) > 0:
         plt.plot(np.array(target_ee_list)[:,0],'k')
@@ -217,7 +242,8 @@ def main():
         plt.ylabel('X (m)')
         plt.legend(['Target EE Position','Result EE Position'])
         plt.title('End Effector X position')
-        plt.show()
+        # plt.show()
+        plt.savefig("answer1")
 
     # Plot the cached trot gait path for one foot.
     if len(inverse_kinematics.target_ee_cache):
