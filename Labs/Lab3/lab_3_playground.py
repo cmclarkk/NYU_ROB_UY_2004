@@ -47,12 +47,13 @@ class InverseKinematics():
         ################################################################################################
         # TODO: Implement the trotting gait
         ################################################################################################
-        touch_down_position = np.array([0,0,0])
-        stand_position_1 = np.array([0,0,0])
-        stand_position_2 = np.array([0,0,0])
-        stand_position_3 = np.array([0,0,0])
-        liftoff_position = np.array([0,0,0])
-        mid_swing_position = np.array([0,0,0])
+            
+        touch_down_position = np.array([0.05,0,-0.14])
+        stand_position_1 = np.array([0.025,0,-0.14])
+        stand_position_2 = np.array([0 , 0, -0.14])
+        stand_position_3 = np.array([-0.025,0,-0.14])
+        liftoff_position = np.array([-0.05,0,-0.14])
+        mid_swing_position = np.array([0,0,-0.05])
         
         ## trotting
         # TODO: Implement each leg’s trajectory in the trotting gait.
@@ -61,7 +62,13 @@ class InverseKinematics():
             ################################################################################################
             # TODO: Implement the trotting gait
             ################################################################################################
+            liftoff_position,    
+            mid_swing_position, 
             touch_down_position,
+            stand_position_1,
+            stand_position_2,
+            stand_position_3,
+            liftoff_position
         ]) + rf_ee_offset
         
         lf_ee_offset = np.array([0.06, 0.09, 0])
@@ -70,6 +77,13 @@ class InverseKinematics():
             # TODO: Implement the trotting gait
             ################################################################################################
             touch_down_position,
+            stand_position_1,
+            stand_position_2,
+            stand_position_3,
+            liftoff_position,
+            mid_swing_position,
+            touch_down_position
+            
         ]) + lf_ee_offset
         
         rb_ee_offset = np.array([-0.11, -0.09, 0])
@@ -78,6 +92,12 @@ class InverseKinematics():
             # TODO: Implement the trotting gait
             ################################################################################################
             touch_down_position,
+            stand_position_1,
+            stand_position_2,
+            stand_position_3,
+            liftoff_position,
+            mid_swing_position,
+            touch_down_position
         ]) + rb_ee_offset
         
         lb_ee_offset = np.array([-0.11, 0.09, 0])
@@ -85,16 +105,24 @@ class InverseKinematics():
             ################################################################################################
             # TODO: Implement the trotting gait
             ################################################################################################
+            liftoff_position,    
+            mid_swing_position, 
+            stand_position_3,
+            stand_position_2,
+            stand_position_1,
             touch_down_position,
+            liftoff_position
         ]) + lb_ee_offset
+
+      
 
 
         self.ee_triangle_positions = [rf_ee_triangle_positions, lf_ee_triangle_positions, rb_ee_triangle_positions, lb_ee_triangle_positions]
         self.fk_functions = [self.fr_leg_fk, self.fl_leg_fk, self.br_leg_fk, self.bl_leg_fk]
         self.target_joint_positions_cache, self.target_ee_cache = [], []
-        # self.target_joint_positions_cache, self.target_ee_cache = self.cache_target_joint_positions()
-        # print(f'shape of target_joint_positions_cache: {self.target_joint_positions_cache.shape}')
-        # print(f'shape of target_ee_cache: {self.target_ee_cache.shape}')
+        self.target_joint_positions_cache, self.target_ee_cache = self.cache_target_joint_positions()
+        print(f'shape of target_joint_positions_cache: {self.target_joint_positions_cache.shape}')
+        print(f'shape of target_ee_cache: {self.target_ee_cache.shape}')
 
 
     def fr_leg_fk(self, theta):
@@ -172,7 +200,26 @@ class InverseKinematics():
         ################################################################################################
         # TODO: implement interpolation for all 4 legs here
         ################################################################################################
-        return 0
+        pts = self.ee_triangle_positions[leg_index]
+        num_segments = len(pts) - 1
+        
+        segment_length = 1.0 / num_segments
+
+        segment = int(t / segment_length)
+
+        if segment >= num_segments:
+            return pts[-1]
+
+        local_t = (t - segment * segment_length) / segment_length
+
+        p1 = pts[segment]
+        p2 = pts[segment + 1]
+
+        interpolated = (1 - local_t) * p1 + local_t * p2
+
+        return interpolated
+        
+
 
     def cache_target_joint_positions(self):
         # Calculate and store the target joint positions for a cycle and all 4 legs
@@ -235,15 +282,15 @@ def main():
     print(result_ee_list)
 
     # Plot the EE results
-    if len(result_ee_list) > 0:
-        plt.plot(np.array(target_ee_list)[:,0],'k')
-        plt.plot(np.array(result_ee_list)[:,0],'ro')
-        plt.xlabel('Step')
-        plt.ylabel('X (m)')
-        plt.legend(['Target EE Position','Result EE Position'])
-        plt.title('End Effector X position')
-        # plt.show()
-        plt.savefig("answer1")
+    # if len(result_ee_list) > 0:
+    #     plt.plot(np.array(target_ee_list)[:,0],'k')
+    #     plt.plot(np.array(result_ee_list)[:,0],'ro')
+    #     plt.xlabel('Step')
+    #     plt.ylabel('X (m)')
+    #     plt.legend(['Target EE Position','Result EE Position'])
+    #     plt.title('End Effector X position')
+    #     # plt.show()
+    #     plt.savefig("answer1")
 
     # Plot the cached trot gait path for one foot.
     if len(inverse_kinematics.target_ee_cache):
@@ -256,8 +303,7 @@ def main():
         plt.ylabel('Z(m)')
         plt.title('EE front right foot trot gait')
         plt.plot(x_list, z_list)
-        plt.show()
-
+        plt.savefig("answer2.png")
 
 
 if __name__ == '__main__':

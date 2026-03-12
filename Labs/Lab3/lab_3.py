@@ -59,18 +59,17 @@ class InverseKinematics(Node):
         self.joint_velocities = None
         self.target_joint_positions = None
         self.counter = 0
-
-        # Trotting gate positions
+  # Trotting gate positions
         ################################################################################################
         # TODO: Implement the trotting gait
         ################################################################################################
             
         touch_down_position = np.array([0.05,0,-0.14])
         stand_position_1 = np.array([0.025,0,-0.14])
-        stand_position_2 = np.array([0 ,0, -0.14])
+        stand_position_2 = np.array([0 , 0, -0.14])
         stand_position_3 = np.array([-0.025,0,-0.14])
         liftoff_position = np.array([-0.05,0,-0.14])
-        mid_swing_position = np.array([0.05,0.09,-0.05])
+        mid_swing_position = np.array([0,0,-0.05])
         
         ## trotting
         # TODO: Implement each leg’s trajectory in the trotting gait.
@@ -81,10 +80,10 @@ class InverseKinematics(Node):
             ################################################################################################
             liftoff_position,    
             mid_swing_position, 
+            touch_down_position,
             stand_position_1,
             stand_position_2,
-            stand_position_3,
-            touch_down_position
+            stand_position_3
         ]) + rf_ee_offset
         
         lf_ee_offset = np.array([0.06, 0.09, 0])
@@ -92,12 +91,13 @@ class InverseKinematics(Node):
             ################################################################################################
             # TODO: Implement the trotting gait
             ################################################################################################
-            touch_down_position,
             stand_position_1,
             stand_position_2,
             stand_position_3,
             liftoff_position,
-            mid_swing_position
+            mid_swing_position,
+            touch_down_position
+            
         ]) + lf_ee_offset
         
         rb_ee_offset = np.array([-0.11, -0.09, 0])
@@ -105,12 +105,12 @@ class InverseKinematics(Node):
             ################################################################################################
             # TODO: Implement the trotting gait
             ################################################################################################
-            touch_down_position,
             stand_position_1,
             stand_position_2,
             stand_position_3,
             liftoff_position,
-            mid_swing_position
+            mid_swing_position,
+            touch_down_position
         ]) + rb_ee_offset
         
         lb_ee_offset = np.array([-0.11, 0.09, 0])
@@ -120,10 +120,10 @@ class InverseKinematics(Node):
             ################################################################################################
             liftoff_position,    
             mid_swing_position, 
-            stand_position_3,
-            stand_position_2,
+            touch_down_position,
             stand_position_1,
-            touch_down_position
+            stand_position_2,
+            stand_position_3
         ]) + lb_ee_offset
 
 
@@ -134,7 +134,7 @@ class InverseKinematics(Node):
         print(f'shape of target_joint_positions_cache: {self.target_joint_positions_cache.shape}')
         print(f'shape of target_ee_cache: {self.target_ee_cache.shape}')
 
-
+ 
         self.pd_timer_period = 1.0 / 200  # 200 Hz
         self.ik_timer_period = 1.0 / 100   # 10 Hz
         self.pd_timer = self.create_timer(self.pd_timer_period, self.pd_timer_callback)
@@ -225,11 +225,25 @@ class InverseKinematics(Node):
         ################################################################################################
         # TODO: implement interpolation for all 4 legs here
         ################################################################################################ 
-        #        
-        
-        
-        pass
 
+        pts = self.ee_triangle_positions[leg_index]
+
+        num_segments = len(pts) - 1
+        segment_length = 1.0 / num_segments
+
+        segment = int(t / segment_length)
+
+        if segment >= num_segments:
+            return pts[-1]
+
+        local_t = (t - segment * segment_length) / segment_length
+
+        p1 = pts[segment]
+        p2 = pts[segment + 1]
+
+        interpolated = (1 - local_t) * p1 + local_t * p2
+
+        return interpolated
         
 
 
@@ -297,6 +311,9 @@ def main():
         
         inverse_kinematics.destroy_node()
         rclpy.shutdown()
+        
+
+    
 
 if __name__ == '__main__':
     main()

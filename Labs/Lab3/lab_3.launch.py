@@ -42,7 +42,7 @@ def generate_launch_description():
     robot_controllers = PathJoinSubstitution(
         [
             ThisLaunchFileDir(),
-            "lab_4.yaml",
+            "lab_3.yaml",
         ]
     )
 
