@@ -226,9 +226,9 @@ class InverseKinematics(Node):
         # TODO: implement interpolation for all 4 legs here
         ################################################################################################ 
         #        
-
-        if t == 0:
-            self.ee_triangle_positions[leg_index][0]
+        
+        
+        pass
 
         
 
